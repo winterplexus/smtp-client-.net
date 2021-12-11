@@ -1,9 +1,10 @@
 ﻿//
 //  MainWindow.xaml.cs
 //
-//  Copyright (c) Wiregrass Code Technology 2019-2021
+//  Copyright (c) Wiregrass Code Technology 2019-2022
 //
 using System;
+using System.Globalization;
 using System.Reflection;
 using System.Text;
 using System.Windows;
@@ -59,7 +60,7 @@ namespace SmtpClient
             if (descriptionAttributes.Length > 0)
             {
                 _ = message.Append(((AssemblyDescriptionAttribute)descriptionAttributes[0]).Description).Append(Environment.NewLine);
-                _ = message.Append($"v{assembly.GetName().Version}").Append(Environment.NewLine);
+                _ = message.Append(CultureInfo.InvariantCulture, $"v{assembly.GetName().Version}").Append(Environment.NewLine);
             }
 
             var copyrightAttributes = assembly.GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
@@ -93,8 +94,6 @@ namespace SmtpClient
 
         private void ClearButtonClick(object sender, RoutedEventArgs e)
         {
-            mailData = new();
-
             ServerNameText.Text = string.Empty;
             PortNumberText.Text = "25";
             UserNameText.Text = string.Empty;
@@ -120,21 +119,23 @@ namespace SmtpClient
 
         private MailData GetMailData()
         {
-            mailData.ServerName = ServerNameText.Text;
-            mailData.PortNumber = PortNumber();
-            mailData.UserName = UserNameText.Text;
-            mailData.Password = PasswordBox.Password;
-            mailData.UseAuthentication = UseAuthenticationCheckBox.IsChecked == true;
-            mailData.UseEnableTls = UseTlsCheckBox.IsChecked == true;
-            mailData.From = FromAddressText.Text;
-            mailData.FromDisplayName = FromDisplayText.Text;
-            mailData.To = ToAddressText.Text;
-            mailData.ToDisplayName = ToDisplayText.Text;
-            mailData.Cc = CcAddressText.Text;
-            mailData.Bcc = BccAddressText.Text;
-            mailData.Subject = SubjectText.Text;
-            mailData.Body = BodyText.Text;
-
+            mailData = new()
+            {
+                ServerName = ServerNameText.Text,
+                PortNumber = PortNumber(),
+                UserName = UserNameText.Text,
+                Password = PasswordBox.Password,
+                UseAuthentication = UseAuthenticationCheckBox.IsChecked == true,
+                UseEnableTls = UseTlsCheckBox.IsChecked == true,
+                From = FromAddressText.Text,
+                FromDisplayName = FromDisplayText.Text,
+                To = ToAddressText.Text,
+                ToDisplayName = ToDisplayText.Text,
+                Cc = CcAddressText.Text,
+                Bcc = BccAddressText.Text,
+                Subject = SubjectText.Text,
+                Body = BodyText.Text,
+            };
             return mailData;
         }
 

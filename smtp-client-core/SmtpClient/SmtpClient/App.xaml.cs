@@ -1,7 +1,7 @@
 ﻿//
 //  App.xaml.cs
 //
-//  Copyright (c) Wiregrass Code Technology 2019-2021
+//  Copyright (c) Wiregrass Code Technology 2019-2022
 //
 using System.Windows;
 

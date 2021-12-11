@@ -2,20 +2,20 @@
 
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net5.0-windows</TargetFramework>
+        <TargetFramework>net6.0-windows</TargetFramework>
         <Authors>Wiregrass Code Technology</Authors>
         <Company>Wiregrass Code Technology</Company>
         <Product>SMTP Client</Product>
         <Description>Simple SMTP client application based on MailKit</Description>
-        <Copyright>Copyright © 2019-2021 Wiregrass Code Technology</Copyright>
+        <Copyright>Copyright © 2019-2022 Wiregrass Code Technology</Copyright>
         <AssemblyName>SmtpClient</AssemblyName>
         <RootNamespace>SmtpClient</RootNamespace>
-        <SignAssembly>true</SignAssembly>
+        <SignAssembly>False</SignAssembly>
         <AssemblyOriginatorKeyFile>NameKey.snk</AssemblyOriginatorKeyFile>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
         <AnalysisMode>AllEnabledByDefault</AnalysisMode>
         <AnalysisLevel>latest</AnalysisLevel>
-        <Version>1.1.0</Version>
+        <Version>1.2.0.0</Version>
         <UseWPF>true</UseWPF>
         <ApplicationIcon>Resources\mail-server.ico</ApplicationIcon>
     </PropertyGroup>
@@ -33,7 +33,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="5.0.3">
+        <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="6.0.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
