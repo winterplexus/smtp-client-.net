@@ -4,6 +4,7 @@
 //  Copyright (c) Wiregrass Code Technology 2019-2022
 //
 using System;
+using System.Configuration;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
@@ -12,12 +13,11 @@ using System.Windows.Media;
 using Microsoft.Win32;
 using SmtpClient.Interlink;
 
-[assembly: CLSCompliant(true)]
 namespace SmtpClient
 {
     public partial class MainWindow : Window
     {
-        private MailData mailData = new();
+        private readonly MailData mailData;
 
         public MainWindow()
         {
@@ -26,6 +26,8 @@ namespace SmtpClient
 
             InitializeComponent();
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
+
+            mailData = new();
         }
 
         private void AttachFileButtonClick(object sender, RoutedEventArgs e)
@@ -47,6 +49,133 @@ namespace SmtpClient
                 {
                     mailData.AttachmentFiles.Add(openFileDialog.FileName);
                 }
+            }
+        }
+
+        private void SendButtonClick(object sender, RoutedEventArgs e)
+        {
+            if (!IsValidateInput())
+            {
+                return;
+            }
+
+            try
+            {
+                GetMailData();
+                MailClient.SendSmtpMail(mailData);
+
+                DisplayInformationMessage($"Email sent to {mailData.To}.");
+            }
+            catch (MailClientException mce)
+            {
+                MessageText.Text = $"exception-> {mce.Message}. {mce.InnerException}";
+            }
+        }
+
+        private bool IsValidateInput()
+        {
+            if (string.IsNullOrEmpty(ServerNameText.Text))
+            {
+                DisplayErrorMessage("Server name is missing or empty.");
+                return false;
+            }
+            if (string.IsNullOrEmpty(PortNumberText.Text))
+            {
+                DisplayErrorMessage("Port number is missing or empty.");
+                return false;
+            }
+            if (UseAuthenticationCheckBox.IsChecked == true)
+            {
+                if (string.IsNullOrEmpty(UserNameText.Text))
+                {
+                    DisplayErrorMessage("User name is missing or empty.");
+                    return false;
+                }
+                if (string.IsNullOrEmpty(PasswordBox.Password))
+                {
+                    DisplayErrorMessage("Password is missing or empty.");
+                    return false;
+                }
+            }
+            if (string.IsNullOrEmpty(SubjectText.Text))
+            {
+                DisplayErrorMessage("Subject is missing or empty.");
+                return false;
+            }
+            return true;
+        }
+
+        private void ClearButtonClick(object sender, RoutedEventArgs e)
+        {
+            ServerNameText.Text                 = string.Empty;
+            PortNumberText.Text                 = "25";
+            UserNameText.Text                   = string.Empty;
+            PasswordBox.Password                = string.Empty;
+            UseAuthenticationCheckBox.IsChecked = false;
+            UseTlsCheckBox.IsChecked            = false;
+            FromAddressText.Text                = string.Empty;
+            FromDisplayText.Text                = string.Empty;
+            ToAddressText.Text                  = string.Empty;
+            ToDisplayText.Text                  = string.Empty;
+            CcAddressText.Text                  = string.Empty;
+            BccAddressText.Text                 = string.Empty;
+            SubjectText.Text                    = string.Empty;
+            BodyText.Text                       = string.Empty;
+            MessageText.Text                    = string.Empty;
+            MessageText.Foreground              = Brushes.MediumBlue;
+        }
+
+        private void GetMailData()
+        {
+            mailData.ServerName        = ServerNameText.Text;
+            mailData.PortNumber        = PortNumber();
+            mailData.UserName          = UserNameText.Text;
+            mailData.Password          = PasswordBox.Password;
+            mailData.UseAuthentication = UseAuthenticationCheckBox.IsChecked == true;
+            mailData.EnableTls         = UseTlsCheckBox.IsChecked == true;
+            mailData.Timeout           = Timeout();
+            mailData.From              = FromAddressText.Text;
+            mailData.FromDisplayName   = FromDisplayText.Text;
+            mailData.To                = ToAddressText.Text;
+            mailData.ToDisplayName     = ToDisplayText.Text;
+            mailData.Cc                = CcAddressText.Text;
+            mailData.Bcc               = BccAddressText.Text;
+            mailData.Subject           = SubjectText.Text;
+            mailData.Body              = BodyText.Text;           
+        }
+
+        private int PortNumber()
+        {
+            int portNumber = 25;
+
+            try
+            {
+                if (!int.TryParse(PortNumberText.Text, out portNumber))
+                {
+                    DisplayErrorMessage("Port number is not a number.");
+                }
+            }
+            catch (OverflowException)
+            {
+            }
+            catch (FormatException)
+            {
+            }
+
+            return portNumber;
+        }
+
+        private static int Timeout()
+        {
+            var appSettings = ConfigurationManager.AppSettings;
+            if (appSettings.Count == 0)
+            {
+                return 5000;
+            }
+            else
+            {
+                var configurationValue = appSettings["MailTimeout"];
+                return int.TryParse(configurationValue, out var number) ? number : 0;
             }
         }
 
@@ -72,125 +201,9 @@ namespace SmtpClient
             _ = MessageBox.Show(message.ToString(), "About");
         }
 
-        private void SendButtonClick(object sender, RoutedEventArgs e)
-        {
-            var mailData = GetMailData();
-            if (!ValidateData(mailData))
-            {
-                return;
-            }
-
-            try
-            {
-                MailClient.SendSmtpMail(mailData);
-
-                DisplayInformationMessage($"Email sent to {mailData.To}.");
-            }
-            catch (MailClientException mce)
-            {
-                MessageText.Text = $"exception-> {mce.Message}. {mce.InnerException}";
-            }
-        }
-
-        private void ClearButtonClick(object sender, RoutedEventArgs e)
-        {
-            ServerNameText.Text = string.Empty;
-            PortNumberText.Text = "25";
-            UserNameText.Text = string.Empty;
-            PasswordBox.Password = string.Empty;
-            UseAuthenticationCheckBox.IsChecked = false;
-            UseTlsCheckBox.IsChecked = false;
-            FromAddressText.Text = string.Empty;
-            FromDisplayText.Text = string.Empty;
-            ToAddressText.Text = string.Empty;
-            ToDisplayText.Text = string.Empty;
-            CcAddressText.Text = string.Empty;
-            BccAddressText.Text = string.Empty;
-            SubjectText.Text = string.Empty;
-            BodyText.Text = string.Empty;
-            MessageText.Text = string.Empty;
-            MessageText.Foreground = Brushes.MediumBlue;
-        }
-
         private void ExitButtonClick(object sender, RoutedEventArgs e)
         {
             Close();
-        }
-
-        private MailData GetMailData()
-        {
-            mailData = new()
-            {
-                ServerName = ServerNameText.Text,
-                PortNumber = PortNumber(),
-                UserName = UserNameText.Text,
-                Password = PasswordBox.Password,
-                UseAuthentication = UseAuthenticationCheckBox.IsChecked == true,
-                UseEnableTls = UseTlsCheckBox.IsChecked == true,
-                From = FromAddressText.Text,
-                FromDisplayName = FromDisplayText.Text,
-                To = ToAddressText.Text,
-                ToDisplayName = ToDisplayText.Text,
-                Cc = CcAddressText.Text,
-                Bcc = BccAddressText.Text,
-                Subject = SubjectText.Text,
-                Body = BodyText.Text,
-            };
-            return mailData;
-        }
-
-        private bool ValidateData(MailData mailData)
-        {
-            if (string.IsNullOrEmpty(ServerNameText.Text))
-            {
-                DisplayErrorMessage("Server name is missing or empty.");
-                return false;
-            }
-            if (string.IsNullOrEmpty(PortNumberText.Text))
-            {
-                DisplayErrorMessage("Port number is missing or empty.");
-                return false;
-            }
-            if (UseAuthenticationCheckBox.IsChecked == true)
-            {
-                if (string.IsNullOrEmpty(UserNameText.Text))
-                {
-                    DisplayErrorMessage("User name is missing or empty.");
-                    return false;
-                }
-                if (string.IsNullOrEmpty(PasswordBox.Password))
-                {
-                    DisplayErrorMessage("Password is missing or empty.");
-                    return false;
-                }
-            }
-            if (string.IsNullOrEmpty(mailData.Subject))
-            {
-                DisplayErrorMessage("Subject is missing or empty.");
-                return false;
-            }
-            return true;
-        }
-
-        private int PortNumber()
-        {
-            int portNumber = 25;
-
-            try
-            {
-                if (!int.TryParse(PortNumberText.Text, out portNumber))
-                {
-                    DisplayErrorMessage("Port number is not a number.");
-                }
-            }
-            catch (OverflowException)
-            {
-            }
-            catch (FormatException)
-            {
-            }
-
-            return portNumber;
         }
 
         private void DisplayInformationMessage(string message)

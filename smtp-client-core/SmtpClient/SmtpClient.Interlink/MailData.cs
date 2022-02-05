@@ -14,20 +14,21 @@ namespace SmtpClient.Interlink
             AttachmentFiles = new List<string>();
         }
 
-        public string ServerName { get; set; }
-        public int PortNumber { get; set; }
-        public string UserName { get; set; }
-        public string Password { get; set; }
-        public bool UseAuthentication { get; set; }
-        public bool UseEnableTls { get; set; }
-        public string From { get; set; }
-        public string FromDisplayName { get; set; }
-        public string To { get; set; }
-        public string ToDisplayName { get; set; }
-        public string Cc { get; set; }
-        public string Bcc { get; set; }
-        public string Subject { get; set; }
-        public string Body { get; set; }
+        public string ServerName        { get; set; }
+        public int    PortNumber        { get; set; }
+        public string UserName          { get; set; }
+        public string Password          { get; set; }
+        public bool   UseAuthentication { get; set; }
+        public bool   EnableTls         { get; set; }
+        public int    Timeout           { get; set; }
+        public string From              { get; set; }
+        public string FromDisplayName   { get; set; }
+        public string To                { get; set; }
+        public string ToDisplayName     { get; set; }
+        public string Cc                { get; set; }
+        public string Bcc               { get; set; }
+        public string Subject           { get; set; }
+        public string Body              { get; set; }
         public ICollection<string> AttachmentFiles { get; }
     }
 }

@@ -12,8 +12,6 @@ namespace SmtpClient.Interlink
 {
     public static class MailClient
     {
-        private const int timeout = 5000;
-
         public static void SendSmtpMail(MailData mailData)
         {
             if (mailData == null)
@@ -27,9 +25,9 @@ namespace SmtpClient.Interlink
             {
                 using var client = new MailKit.Net.Smtp.SmtpClient();
 
-                client.Timeout = timeout;
+                client.Timeout = mailData.Timeout;
 
-                if (mailData.UseEnableTls)
+                if (mailData.EnableTls)
                 {
                     client.Connect(mailData.ServerName, mailData.PortNumber, SecureSocketOptions.StartTls);
                 }

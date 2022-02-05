@@ -3,8 +3,10 @@
 //
 //  Copyright (c) Wiregrass Code Technology 2019-2022
 //
+using System;
 using System.Windows;
 
+[assembly: CLSCompliant(true)]
 namespace SmtpClient
 {
     public partial class App : Application
