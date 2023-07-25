@@ -1,9 +1,9 @@
 ﻿//
 //  MailParameters.cs
 //
-//  Copyright (c) Wiregrass Code Technology 2019-2022
+//  Copyright (c) Wiregrass Code Technology 2019-2023
 //
-namespace SmtpClient.Interlink
+namespace SmtpClient.Mailer
 {
     public class MailParameters
     {

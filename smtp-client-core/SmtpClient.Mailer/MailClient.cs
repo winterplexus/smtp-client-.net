@@ -1,7 +1,7 @@
 ﻿//
 //  MailClient.cs
 //
-//  Copyright (c) Wiregrass Code Technology 2019-2022
+//  Copyright (c) Wiregrass Code Technology 2019-2023
 //
 using System;
 using MimeKit;
@@ -9,7 +9,7 @@ using MailKit;
 using MailKit.Security;
 
 [assembly: CLSCompliant(true)]
-namespace SmtpClient.Interlink
+namespace SmtpClient.Mailer
 {
     public static class MailClient
     {

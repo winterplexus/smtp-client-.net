@@ -1,12 +1,12 @@
 ﻿//
 //  MailClientException.cs
 //
-//  Copyright (c) Wiregrass Code Technology 2019-2022
+//  Copyright (c) Wiregrass Code Technology 2019-2023
 //
 using System;
 using System.Runtime.Serialization;
 
-namespace SmtpClient.Interlink
+namespace SmtpClient.Mailer
 {
     [Serializable]
     public class MailClientException : Exception

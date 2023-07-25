@@ -1,7 +1,7 @@
 ﻿//
 //  MainWindow.xaml.cs
 //
-//  Copyright (c) Wiregrass Code Technology 2019-2022
+//  Copyright (c) Wiregrass Code Technology 2019-2023
 //
 using System;
 using System.Configuration;
@@ -9,9 +9,8 @@ using System.Globalization;
 using System.Reflection;
 using System.Text;
 using System.Windows;
-using System.Windows.Media;
 using Microsoft.Win32;
-using SmtpClient.Interlink;
+using SmtpClient.Mailer;
 
 namespace SmtpClient
 {
@@ -34,9 +33,11 @@ namespace SmtpClient
 
         private void AttachFileButtonClick(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog openFileDialog = new();
-            openFileDialog.Multiselect = true;
-            openFileDialog.Filter = "All files (*.*)|*.*";
+            OpenFileDialog openFileDialog = new()
+            {
+                Multiselect = true,
+                Filter = "All files (*.*)|*.*"
+            };
 
             if (openFileDialog.ShowDialog() == true)
             {
@@ -71,29 +72,13 @@ namespace SmtpClient
             }
             catch (MailClientException mce)
             {
-                MessageText.Text = $"exception-> {mce.Message}. {mce.InnerException}";
+                DisplayExceptionMessage(mce.Message, mce.InnerException.Message);
             }
         }
 
         private void ClearButtonClick(object sender, RoutedEventArgs e)
         {
-            ServerNameText.Text = string.Empty;
-            PortNumberText.Text = "25";
-            UserNameText.Text = string.Empty;
-            PasswordBox.Password = string.Empty;
-            UseAuthenticationCheckBox.IsChecked = false;
-            UseTlsCheckBox.IsChecked = false;
-            FromAddressText.Text = string.Empty;
-            FromDisplayText.Text = string.Empty;
-            ToAddressText.Text = string.Empty;
-            ToDisplayText.Text = string.Empty;
-            CcAddressText.Text = string.Empty;
-            BccAddressText.Text = string.Empty;
-            SubjectText.Text = string.Empty;
-            BodyText.Text = string.Empty;
-            MessageText.Visibility = Visibility.Hidden;
-            MessageText.Text = string.Empty;
-            MessageText.Foreground = Brushes.MediumBlue;
+            InitializeFields();
         }
 
         private void AboutButtonClick(object sender, RoutedEventArgs e)
@@ -125,23 +110,20 @@ namespace SmtpClient
 
         private void InitializeFields()
         {
-            ServerNameText.Text = string.Empty;
-            PortNumberText.Text = "25";
-            UserNameText.Text = string.Empty;
-            PasswordBox.Password = string.Empty;
+            ServerNameText.Text                 = string.Empty;
+            PortNumberText.Text                 = "25";
+            UserNameText.Text                   = string.Empty; 
+            PasswordBox.Password                = string.Empty;
             UseAuthenticationCheckBox.IsChecked = false;
-            UseTlsCheckBox.IsChecked = false;
-            FromAddressText.Text = string.Empty;
-            FromDisplayText.Text = string.Empty;
-            ToAddressText.Text = string.Empty;
-            ToDisplayText.Text = string.Empty;
-            CcAddressText.Text = string.Empty;
-            BccAddressText.Text = string.Empty;
-            SubjectText.Text = string.Empty;
-            BodyText.Text = string.Empty;
-            MessageText.Visibility = Visibility.Hidden;
-            MessageText.Text = string.Empty;
-            MessageText.Foreground = Brushes.MediumBlue;
+            UseTlsCheckBox.IsChecked            = false;
+            FromAddressText.Text                = string.Empty;
+            FromDisplayText.Text                = string.Empty;
+            ToAddressText.Text                  = string.Empty;
+            ToDisplayText.Text                  = string.Empty;
+            CcAddressText.Text                  = string.Empty;
+            BccAddressText.Text                 = string.Empty;
+            SubjectText.Text                    = string.Empty;
+            BodyText.Text                       = string.Empty;
         }
 
         private bool IsValidateInput()
@@ -179,22 +161,22 @@ namespace SmtpClient
 
         private void GetMailSessionData()
         {
-            mailSession.Parameters.ServerName = ServerNameText.Text;
-            mailSession.Parameters.PortNumber = PortNumber();
-            mailSession.Parameters.UserName = UserNameText.Text;
-            mailSession.Parameters.Password = PasswordBox.Password;
-            mailSession.Parameters.UseAuthentication = UseAuthenticationCheckBox.IsChecked == true;
-            mailSession.Parameters.EnableTls = UseTlsCheckBox.IsChecked == true;
-            mailSession.Parameters.Timeout = Timeout();
+            mailSession.Parameters.ServerName          = ServerNameText.Text;
+            mailSession.Parameters.PortNumber          = PortNumber();
+            mailSession.Parameters.UserName            = UserNameText.Text;
+            mailSession.Parameters.Password            = PasswordBox.Password;
+            mailSession.Parameters.UseAuthentication   = UseAuthenticationCheckBox.IsChecked == true;
+            mailSession.Parameters.EnableTls           = UseTlsCheckBox.IsChecked == true;
+            mailSession.Parameters.Timeout             = Timeout();
             mailSession.Parameters.ProtocolLogFilePath = ProtocolLogFilePath();
-            mailSession.Message.From = FromAddressText.Text;
-            mailSession.Message.FromDisplayName = FromDisplayText.Text;
-            mailSession.Message.To = ToAddressText.Text;
-            mailSession.Message.ToDisplayName = ToDisplayText.Text;
-            mailSession.Message.Cc = CcAddressText.Text;
-            mailSession.Message.Bcc = BccAddressText.Text;
-            mailSession.Message.Subject = SubjectText.Text;
-            mailSession.Message.Body = BodyText.Text;
+            mailSession.Message.From                   = FromAddressText.Text;
+            mailSession.Message.FromDisplayName        = FromDisplayText.Text;
+            mailSession.Message.To                     = ToAddressText.Text;
+            mailSession.Message.ToDisplayName          = ToDisplayText.Text;
+            mailSession.Message.Cc                     = CcAddressText.Text;
+            mailSession.Message.Bcc                    = BccAddressText.Text;
+            mailSession.Message.Subject                = SubjectText.Text;
+            mailSession.Message.Body                   = BodyText.Text;
         }
 
         private int PortNumber()
@@ -243,18 +225,24 @@ namespace SmtpClient
             }
         }
 
-        private void DisplayInformationMessage(string message)
+        private static void DisplayInformationMessage(string message)
         {
-            MessageText.Visibility = Visibility.Visible;
-            MessageText.Text = message;
-            MessageText.Foreground = Brushes.MediumBlue;
+            _ = MessageBox.Show(message, "Information");
         }
 
-        private void DisplayErrorMessage(string message)
+        private static void DisplayErrorMessage(string message)
         {
-            MessageText.Visibility = Visibility.Visible;
-            MessageText.Text = message;
-            MessageText.Foreground = Brushes.OrangeRed;
+            _ = MessageBox.Show(message, "Error");
+        }
+
+        private static void DisplayExceptionMessage(string exceptionMessage, string innerExceptionMessage)
+        {
+            StringBuilder message = new();
+
+            _ = message.Append(CultureInfo.InvariantCulture, $"{exceptionMessage}").Append(Environment.NewLine);
+            _ = message.Append(CultureInfo.InvariantCulture, $"{innerExceptionMessage}");
+
+            _ = MessageBox.Show(message.ToString(), "Exception");
         }
     }
 }
